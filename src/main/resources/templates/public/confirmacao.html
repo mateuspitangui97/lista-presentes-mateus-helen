@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Pagamento Enviado!')}"></head>
+<body>
+
+<header th:replace="~{fragments/header :: header}"></header>
+<nav th:replace="~{fragments/header :: nav-public}"></nav>
+
+<main class="container">
+    <div class="page-content confirmation-box">
+        <div class="pending-animation">
+            <div class="pending-icon">&#9203;</div>
+        </div>
+
+        <h2>Pagamento Enviado!</h2>
+
+        <p class="status-message">
+            Seu pagamento esta sendo verificado.
+            <br>Em breve o presente sera confirmado.
+        </p>
+
+        <div class="confirmed-item">
+            <h3 th:text="${item.nome}">Nome do Produto</h3>
+            <div class="confirmed-item-price" th:text="${#numbers.formatCurrency(item.valor)}">R$ 0,00</div>
+        </div>
+
+        <!-- Mensagem personalizada de agradecimento -->
+        <div class="thank-you-box"
+             th:if="${config != null and config.mensagemAgradecimento != null and !config.mensagemAgradecimento.isEmpty()}">
+            <p th:text="${config.mensagemAgradecimento}">Obrigado pelo presente!</p>
+            <p th:if="${config != null}" class="signature"
+               th:text="'- ' + ${config.nomePessoa1} + ' e ' + ${config.nomePessoa2}">- Casal</p>
+        </div>
+
+        <div class="info-box">
+            <p>
+                <strong>O que acontece agora?</strong><br>
+                Assim que confirmarmos o recebimento do PIX, o presente sera marcado como reservado em seu nome.
+            </p>
+        </div>
+
+        <a th:href="@{/lista}" class="btn btn-primary">Ver Outros Presentes</a>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+
+<style>
+.confirmation-box {
+    text-align: center;
+    padding: 50px 30px;
+    max-width: 550px;
+    margin: 30px auto;
+}
+
+.pending-animation {
+    margin-bottom: 25px;
+}
+
+.pending-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: white;
+    margin: 0 auto;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.confirmation-box h2 {
+    color: #e67e22;
+    margin-bottom: 15px;
+    font-size: 1.8rem;
+}
+
+.status-message {
+    color: #666;
+    font-size: 1.1rem;
+    margin-bottom: 25px;
+    line-height: 1.6;
+}
+
+.confirmed-item {
+    background: #f8f9fa;
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 25px;
+}
+
+.confirmed-item h3 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.confirmed-item-price {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--cor-primaria);
+}
+
+.thank-you-box {
+    background: linear-gradient(135deg, var(--cor-primaria) 0%, var(--cor-secundaria) 100%);
+    color: white;
+    padding: 25px;
+    border-radius: 15px;
+    margin-bottom: 25px;
+}
+
+.thank-you-box p {
+    margin: 0;
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+.thank-you-box .signature {
+    margin-top: 15px;
+    font-style: italic;
+    opacity: 0.9;
+}
+
+.info-box {
+    background: #e8f5e9;
+    border: 1px solid #c8e6c9;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    text-align: left;
+}
+
+.info-box p {
+    margin: 0;
+    color: #2e7d32;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+</style>
+
+</body>
+</html>

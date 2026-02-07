@@ -1,0 +1,29 @@
+spring:
+  # PostgreSQL para producao
+  datasource:
+    url: ${DATABASE_URL}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  h2:
+    console:
+      enabled: false
+
+  thymeleaf:
+    cache: true
+
+# Configuracoes via variaveis de ambiente
+app:
+  admin:
+    username: ${ADMIN_USERNAME:admin}
+    password: ${ADMIN_PASSWORD:admin123}
+
+server:
+  port: ${PORT:8080}

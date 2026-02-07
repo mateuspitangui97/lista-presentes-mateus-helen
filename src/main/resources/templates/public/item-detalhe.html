@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head(${item.nome})}"></head>
+<body>
+
+<header th:replace="~{fragments/header :: header}"></header>
+<nav th:replace="~{fragments/header :: nav-public}"></nav>
+
+<main class="container">
+    <div class="page-content">
+        <div class="item-detail">
+            <div>
+                <img th:if="${item.imagemUrl != null and !item.imagemUrl.isEmpty()}"
+                     th:src="${item.imagemUrl}"
+                     th:alt="${item.nome}">
+                <div th:unless="${item.imagemUrl != null and !item.imagemUrl.isEmpty()}" class="no-image-large">
+                    &#127873;
+                </div>
+            </div>
+            <div class="item-info">
+                <h2 th:text="${item.nome}">Nome do Produto</h2>
+                <div class="price" th:text="${#numbers.formatCurrency(item.valor)}">R$ 0,00</div>
+
+                <div th:if="${item.status.name() == 'RESERVADO'}" class="alert alert-warning">
+                    Este item ja foi reservado por outro convidado.
+                </div>
+
+                <div th:if="${item.descricao}" class="description">
+                    <p th:text="${item.descricao}">Descricao completa do produto</p>
+                </div>
+
+                <div th:if="${item.status.name() == 'DISPONIVEL'}">
+                    <a th:href="@{/checkout/{id}(id=${item.id})}" class="btn btn-primary btn-block">
+                        Quero Presentear
+                    </a>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <a th:href="@{/lista}" class="btn btn-secondary">Voltar para Lista</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+
+</body>
+</html>

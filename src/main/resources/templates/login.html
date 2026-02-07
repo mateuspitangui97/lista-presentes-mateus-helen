@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Login - Admin')}"></head>
+<body>
+
+<main class="login-container">
+    <div class="login-box">
+        <h2>Acesso Administrativo</h2>
+
+        <div th:if="${param.error}" class="alert alert-danger">
+            Usuario ou senha invalidos.
+        </div>
+
+        <div th:if="${param.logout}" class="alert alert-success">
+            Voce saiu do sistema.
+        </div>
+
+        <form th:action="@{/login}" method="post">
+            <div class="form-group">
+                <label for="username">Usuario</label>
+                <input type="text" id="username" name="username" class="form-control"
+                       placeholder="Digite seu usuario" required autofocus>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Senha</label>
+                <input type="password" id="password" name="password" class="form-control"
+                       placeholder="Digite sua senha" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">Entrar</button>
+        </form>
+
+        <div style="text-align: center; margin-top: 20px;">
+            <a th:href="@{/lista}">Voltar para Lista Publica</a>
+        </div>
+    </div>
+</main>
+
+</body>
+</html>

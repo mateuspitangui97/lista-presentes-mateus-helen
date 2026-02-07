@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Admin - Dashboard')}"></head>
+<body>
+
+<header th:replace="~{fragments/header :: header}"></header>
+<nav th:replace="~{fragments/header :: nav-admin}"></nav>
+
+<main class="container">
+    <div class="page-content">
+        <h2 class="page-title">Dashboard - Gerenciar Itens</h2>
+
+        <div th:if="${sucesso}" class="alert alert-success" th:text="${sucesso}"></div>
+        <div th:if="${erro}" class="alert alert-danger" th:text="${erro}"></div>
+
+        <div style="margin-bottom: 20px;">
+            <a th:href="@{/admin/item/novo}" class="btn btn-primary">+ Novo Item</a>
+        </div>
+
+        <div th:if="${#lists.isEmpty(itens)}" class="empty-state">
+            <div class="icon">&#128230;</div>
+            <h3>Nenhum item cadastrado</h3>
+            <p>Clique em "Novo Item" para adicionar presentes a lista.</p>
+        </div>
+
+        <table th:unless="${#lists.isEmpty(itens)}" class="admin-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Valor</th>
+                    <th>Status</th>
+                    <th>Acoes</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="item : ${itens}">
+                    <td th:text="${item.id}">1</td>
+                    <td th:text="${item.nome}">Nome</td>
+                    <td th:text="${#numbers.formatCurrency(item.valor)}">R$ 0,00</td>
+                    <td>
+                        <span th:if="${item.status.name() == 'DISPONIVEL'}" class="badge badge-success">Disponivel</span>
+                        <span th:if="${item.status.name() == 'RESERVADO'}" class="badge badge-warning">Reservado</span>
+                    </td>
+                    <td class="actions">
+                        <a th:href="@{/admin/item/editar/{id}(id=${item.id})}" class="btn btn-secondary">Editar</a>
+                        <form th:action="@{/admin/item/excluir/{id}(id=${item.id})}" method="post" style="display: inline;"
+                              onsubmit="return confirm('Tem certeza que deseja excluir este item?');">
+                            <button type="submit" class="btn btn-danger">Excluir</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+
+</body>
+</html>

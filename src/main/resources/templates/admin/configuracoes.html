@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Admin - Configuracoes')}"></head>
+<body>
+
+<header th:replace="~{fragments/header :: header}"></header>
+<nav th:replace="~{fragments/header :: nav-admin}"></nav>
+
+<main class="container">
+    <div class="page-content">
+        <h2 class="page-title">Configuracoes da Lista</h2>
+
+        <div th:if="${sucesso}" class="alert alert-success" th:text="${sucesso}"></div>
+        <div th:if="${erro}" class="alert alert-danger" th:text="${erro}"></div>
+
+        <!-- Preview -->
+        <div class="config-preview" th:if="${configForm.nomePessoa1 != null}">
+            <img th:if="${configForm.fotoCasalUrl != null and !configForm.fotoCasalUrl.isEmpty()}"
+                 th:src="${configForm.fotoCasalUrl}" alt="Foto do Casal">
+            <h3 th:text="${configForm.nomePessoa1 + ' & ' + configForm.nomePessoa2}">Casal</h3>
+            <p th:if="${configForm.tituloPagina}" th:text="${configForm.tituloPagina}">Titulo</p>
+        </div>
+
+        <form th:action="@{/admin/configuracoes/salvar}" th:object="${configForm}" method="post">
+            <input type="hidden" th:field="*{id}">
+
+            <!-- Secao: Informacoes do Casal -->
+            <div class="form-section">
+                <h3>Informacoes do Casal</h3>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nomePessoa1">Nome da Primeira Pessoa *</label>
+                        <input type="text" id="nomePessoa1" th:field="*{nomePessoa1}" class="form-control"
+                               placeholder="Ex: Maria" required>
+                        <small th:if="${#fields.hasErrors('nomePessoa1')}" style="color: red;"
+                               th:errors="*{nomePessoa1}">Erro</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="nomePessoa2">Nome da Segunda Pessoa *</label>
+                        <input type="text" id="nomePessoa2" th:field="*{nomePessoa2}" class="form-control"
+                               placeholder="Ex: Joao" required>
+                        <small th:if="${#fields.hasErrors('nomePessoa2')}" style="color: red;"
+                               th:errors="*{nomePessoa2}">Erro</small>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="tituloPagina">Titulo da Pagina</label>
+                    <input type="text" id="tituloPagina" th:field="*{tituloPagina}" class="form-control"
+                           placeholder="Ex: Lista de Casamento">
+                </div>
+
+                <div class="form-group">
+                    <label for="mensagemBoasVindas">Mensagem de Boas-Vindas</label>
+                    <textarea id="mensagemBoasVindas" th:field="*{mensagemBoasVindas}" class="form-control"
+                              placeholder="Uma mensagem especial para os convidados..."></textarea>
+                </div>
+            </div>
+
+            <!-- Secao: Fotos -->
+            <div class="form-section">
+                <h3>Fotos</h3>
+
+                <div class="form-group">
+                    <label for="fotoCasalUrl">URL da Foto do Casal</label>
+                    <input type="url" id="fotoCasalUrl" th:field="*{fotoCasalUrl}" class="form-control"
+                           placeholder="https://exemplo.com/foto-casal.jpg">
+                    <small style="color: #666;">Esta foto aparecera no cabecalho em formato circular</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="fotoBannerUrl">URL da Foto de Banner</label>
+                    <input type="url" id="fotoBannerUrl" th:field="*{fotoBannerUrl}" class="form-control"
+                           placeholder="https://exemplo.com/banner.jpg">
+                    <small style="color: #666;">Imagem de fundo do cabecalho (opcional)</small>
+                </div>
+            </div>
+
+            <!-- Secao: Evento -->
+            <div class="form-section">
+                <h3>Informacoes do Evento</h3>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="dataEvento">Data do Evento</label>
+                        <input type="date" id="dataEvento" th:field="*{dataEvento}" class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="localEvento">Local do Evento</label>
+                        <input type="text" id="localEvento" th:field="*{localEvento}" class="form-control"
+                               placeholder="Ex: Sao Paulo, SP">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Secao: Cores -->
+            <div class="form-section">
+                <h3>Personalizacao de Cores</h3>
+
+                <div class="color-picker-container">
+                    <div class="form-group">
+                        <label for="corPrimaria">Cor Primaria</label>
+                        <input type="color" id="corPrimaria" th:field="*{corPrimaria}" class="form-control"
+                               value="#667eea">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="corSecundaria">Cor Secundaria</label>
+                        <input type="color" id="corSecundaria" th:field="*{corSecundaria}" class="form-control"
+                               value="#764ba2">
+                    </div>
+                </div>
+                <small style="color: #666;">Estas cores serao usadas no cabecalho e nos botoes</small>
+            </div>
+
+            <!-- Secao: Mensagens -->
+            <div class="form-section">
+                <h3>Mensagem de Agradecimento</h3>
+
+                <div class="form-group">
+                    <label for="mensagemAgradecimento">Mensagem apos confirmacao de presente</label>
+                    <textarea id="mensagemAgradecimento" th:field="*{mensagemAgradecimento}" class="form-control"
+                              placeholder="Muito obrigado pelo presente! Sua presenca e o melhor presente."></textarea>
+                </div>
+            </div>
+
+            <!-- Secao: PIX -->
+            <div class="form-section">
+                <h3>Dados do PIX</h3>
+                <p style="color: #666; margin-bottom: 20px;">
+                    Estes dados serao exibidos para os convidados no momento do pagamento.
+                    Voce pode cadastrar a chave PIX, o QR Code, ou ambos.
+                </p>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="pixTipo">Tipo de Chave</label>
+                        <select id="pixTipo" th:field="*{pixTipo}" class="form-control">
+                            <option value="">Selecione...</option>
+                            <option value="CPF">CPF</option>
+                            <option value="CNPJ">CNPJ</option>
+                            <option value="EMAIL">E-mail</option>
+                            <option value="TELEFONE">Telefone</option>
+                            <option value="ALEATORIA">Chave Aleatoria</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pixChave">Chave PIX</label>
+                        <input type="text" id="pixChave" th:field="*{pixChave}" class="form-control"
+                               placeholder="Digite sua chave PIX">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="pixNomeTitular">Nome do Titular</label>
+                        <input type="text" id="pixNomeTitular" th:field="*{pixNomeTitular}" class="form-control"
+                               placeholder="Nome que aparece no PIX">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pixBanco">Banco (opcional)</label>
+                        <input type="text" id="pixBanco" th:field="*{pixBanco}" class="form-control"
+                               placeholder="Ex: Nubank, Itau, etc.">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="pixQrcodeUrl">URL da Imagem do QR Code (opcional)</label>
+                    <input type="url" id="pixQrcodeUrl" th:field="*{pixQrcodeUrl}" class="form-control"
+                           placeholder="https://exemplo.com/qrcode-pix.png">
+                    <small style="color: #666;">Cole a URL de uma imagem do seu QR Code PIX.
+                        Voce pode gerar no app do seu banco e fazer upload em um servico de imagens.</small>
+                </div>
+
+                <!-- Preview do QR Code -->
+                <div th:if="${configForm.pixQrcodeUrl != null and !configForm.pixQrcodeUrl.isEmpty()}"
+                     style="margin-top: 15px; text-align: center;">
+                    <p style="color: #666; margin-bottom: 10px;">Preview do QR Code:</p>
+                    <img th:src="${configForm.pixQrcodeUrl}" alt="QR Code PIX"
+                         style="max-width: 200px; border: 2px solid #ddd; border-radius: 10px;">
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 30px;">
+                <button type="submit" class="btn btn-primary">Salvar Configuracoes</button>
+                <a th:href="@{/admin}" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+
+</body>
+</html>

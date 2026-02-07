@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title}">Lista de Presentes</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style th:if="${config != null}" th:inline="text">
+        :root {
+            --cor-primaria: [[${config.corPrimaria ?: '#667eea'}]];
+            --cor-secundaria: [[${config.corSecundaria ?: '#764ba2'}]];
+        }
+    </style>
+</head>
+<body>
+
+<header th:fragment="header">
+    <div class="header-banner" th:if="${config != null and config.fotoBannerUrl != null and !config.fotoBannerUrl.isEmpty()}"
+         th:style="'background-image: url(' + ${config.fotoBannerUrl} + ')'">
+    </div>
+    <div class="header-content">
+        <div class="container">
+            <div class="header-foto" th:if="${config != null and config.fotoCasalUrl != null and !config.fotoCasalUrl.isEmpty()}">
+                <img th:src="${config.fotoCasalUrl}" alt="Foto do Casal" class="foto-casal">
+            </div>
+            <h1 th:if="${config != null}" th:text="${config.nomePessoa1 + ' & ' + config.nomePessoa2}">Lista de Presentes</h1>
+            <h1 th:unless="${config != null}">Lista de Presentes</h1>
+            <p th:if="${config != null and config.tituloPagina != null}" th:text="${config.tituloPagina}">Escolha um presente especial</p>
+            <p th:unless="${config != null and config.tituloPagina != null}">Escolha um presente especial</p>
+            <div th:if="${config != null and config.dataEvento != null}" class="evento-info">
+                <span th:text="${#temporals.format(config.dataEvento, 'dd/MM/yyyy')}"></span>
+                <span th:if="${config.localEvento != null and !config.localEvento.isEmpty()}" th:text="' - ' + ${config.localEvento}"></span>
+            </div>
+        </div>
+    </div>
+</header>
+
+<nav th:fragment="nav-public">
+    <div class="container">
+        <a th:href="@{/lista}">Ver Lista</a>
+    </div>
+</nav>
+
+<nav th:fragment="nav-admin">
+    <div class="container">
+        <a th:href="@{/admin}">Dashboard</a>
+        <a th:href="@{/admin/item/novo}">Novo Item</a>
+        <a th:href="@{/admin/reservas}">Reservas</a>
+        <a th:href="@{/admin/configuracoes}">Configuracoes</a>
+        <a th:href="@{/lista}" target="_blank">Ver Lista Publica</a>
+        <a th:href="@{/logout}" style="float: right;">Sair</a>
+    </div>
+</nav>
+
+</body>
+</html>

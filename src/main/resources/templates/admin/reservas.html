@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Admin - Reservas')}"></head>
+<body>
+
+<header th:replace="~{fragments/header :: header}"></header>
+<nav th:replace="~{fragments/header :: nav-admin}"></nav>
+
+<main class="container">
+    <div class="page-content">
+        <h2 class="page-title">Reservas Realizadas</h2>
+
+        <div th:if="${sucesso}" class="alert alert-success" th:text="${sucesso}"></div>
+        <div th:if="${erro}" class="alert alert-danger" th:text="${erro}"></div>
+
+        <!-- Box com dados do PIX -->
+        <div th:if="${config != null and config.pixChave != null and !config.pixChave.isEmpty()}" class="pix-admin-box">
+            <h4>Seus dados do PIX para cobranca:</h4>
+            <div class="pix-admin-info">
+                <div class="pix-admin-item">
+                    <strong>Tipo:</strong>
+                    <span th:text="${config.pixTipo ?: 'Nao informado'}">Tipo</span>
+                </div>
+                <div class="pix-admin-item">
+                    <strong>Chave:</strong>
+                    <span th:text="${config.pixChave}">Chave</span>
+                </div>
+                <div class="pix-admin-item">
+                    <strong>Titular:</strong>
+                    <span th:text="${config.pixNomeTitular ?: 'Nao informado'}">Nome</span>
+                </div>
+                <div th:if="${config.pixBanco}" class="pix-admin-item">
+                    <strong>Banco:</strong>
+                    <span th:text="${config.pixBanco}">Banco</span>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${config == null or config.pixChave == null or config.pixChave.isEmpty()}" class="alert alert-info">
+            <strong>Atencao:</strong> Voce ainda nao configurou seus dados do PIX.
+            <a th:href="@{/admin/configuracoes}">Clique aqui para configurar.</a>
+        </div>
+
+        <div th:if="${#lists.isEmpty(reservas)}" class="empty-state">
+            <div class="icon">&#128203;</div>
+            <h3>Nenhuma reserva ainda</h3>
+            <p>Quando os convidados reservarem presentes, eles aparecerao aqui.</p>
+        </div>
+
+        <!-- Lista de Reservas em Cards -->
+        <div th:unless="${#lists.isEmpty(reservas)}" class="reservas-grid">
+            <div th:each="reserva : ${reservas}" class="reserva-card">
+                <div class="reserva-header">
+                    <span class="reserva-data" th:text="${#temporals.format(reserva.dataReserva, 'dd/MM/yyyy HH:mm')}">01/01/2024</span>
+                    <!-- Status Badge -->
+                    <span th:if="${reserva.statusItem.name() == 'AGUARDANDO_CONFIRMACAO'}" class="reserva-status status-aguardando">
+                        Aguardando Confirmacao
+                    </span>
+                    <span th:if="${reserva.statusItem.name() == 'RESERVADO'}" class="reserva-status status-confirmado">
+                        Confirmado
+                    </span>
+                </div>
+
+                <div class="reserva-item">
+                    <h4 th:text="${reserva.nomeItem}">Nome do Item</h4>
+                    <div class="reserva-valor" th:text="${#numbers.formatCurrency(reserva.valorItem)}">R$ 0,00</div>
+                </div>
+
+                <div class="reserva-convidado">
+                    <div class="convidado-info">
+                        <strong>Convidado:</strong>
+                        <span th:text="${reserva.nomeConvidado}">Nome</span>
+                    </div>
+                    <div th:if="${reserva.emailConvidado}" class="convidado-info">
+                        <strong>Contato:</strong>
+                        <span th:text="${reserva.emailConvidado}">email@email.com</span>
+                    </div>
+                    <div th:if="${reserva.mensagem}" class="convidado-mensagem">
+                        <strong>Mensagem:</strong>
+                        <p th:text="${reserva.mensagem}">Mensagem do convidado</p>
+                    </div>
+                </div>
+
+                <!-- Aviso para confirmar pagamento -->
+                <div class="reserva-aviso" th:if="${reserva.statusItem.name() == 'AGUARDANDO_CONFIRMACAO'}">
+                    <p>O convidado informou que realizou o pagamento via PIX.</p>
+                    <p><strong>Verifique se o valor de <span th:text="${#numbers.formatCurrency(reserva.valorItem)}">R$ 0,00</span> foi recebido antes de confirmar.</strong></p>
+                </div>
+
+                <div class="reserva-actions">
+                    <!-- Botao Confirmar Pagamento (so aparece se AGUARDANDO_CONFIRMACAO) -->
+                    <form th:if="${reserva.statusItem.name() == 'AGUARDANDO_CONFIRMACAO'}"
+                          th:action="@{/admin/reserva/confirmar/{id}(id=${reserva.id})}" method="post"
+                          style="display: inline;">
+                        <button type="submit" class="btn btn-success">Confirmar Pagamento</button>
+                    </form>
+
+                    <!-- Botao Cancelar Reserva -->
+                    <form th:action="@{/admin/reserva/cancelar/{id}(id=${reserva.id})}" method="post"
+                          onsubmit="return confirm('Cancelar esta reserva? O item voltara a ficar disponivel.');"
+                          style="display: inline;">
+                        <button type="submit" class="btn btn-danger">Cancelar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+
+<style>
+.pix-admin-box {
+    background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+    color: white;
+    padding: 25px;
+    border-radius: 15px;
+    margin-bottom: 30px;
+}
+
+.pix-admin-box h4 {
+    margin-bottom: 15px;
+}
+
+.pix-admin-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.pix-admin-item {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 10px 15px;
+    border-radius: 8px;
+}
+
+.pix-admin-item strong {
+    margin-right: 5px;
+}
+
+.reservas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 25px;
+    margin-top: 20px;
+}
+
+.reserva-card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.reserva-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.reserva-data {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.reserva-status {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.status-aguardando {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-confirmado {
+    background: #d4edda;
+    color: #155724;
+}
+
+.reserva-item {
+    margin-bottom: 20px;
+}
+
+.reserva-item h4 {
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.reserva-valor {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--cor-primaria);
+}
+
+.reserva-convidado {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+
+.convidado-info {
+    margin-bottom: 8px;
+}
+
+.convidado-info strong {
+    color: #333;
+    margin-right: 5px;
+}
+
+.convidado-mensagem {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed #ddd;
+}
+
+.convidado-mensagem p {
+    margin: 5px 0 0 0;
+    color: #666;
+    font-style: italic;
+}
+
+.reserva-aviso {
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+
+.reserva-aviso p {
+    margin: 0 0 5px 0;
+    font-size: 0.9rem;
+    color: #856404;
+}
+
+.reserva-aviso p:last-child {
+    margin-bottom: 0;
+}
+
+.reserva-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.btn-success:hover {
+    opacity: 0.9;
+}
+
+@media (max-width: 768px) {
+    .reservas-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .pix-admin-info {
+        flex-direction: column;
+    }
+}
+</style>
+
+</body>
+</html>
